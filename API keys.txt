@@ -1,0 +1,6 @@
+data.calgary.ca
+Public: d3ye0mgjp2novybl05ipkb9xa
+Secret: 7io250pn4sqvey46l27767jgbn4s2limjf855agr1m6naqob7
+
+account.mapbox.com
+pk.eyJ1Ijoid3luYW5kdHJlZG91eCIsImEiOiJjazdjaGZndzAwZXVtM21teThqZjhsdzBiIn0.MwhI6rhhXpMJ0LkjhXDUHg
