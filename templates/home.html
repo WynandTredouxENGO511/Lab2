@@ -23,9 +23,20 @@
 
 <p>Welcome to my website for ENGO551 lab 2!</p>
 
+<h1>Permit Search</h1>
+
 <body>
     <!-- date range widget -->
-    <input type="text" name="daterange" id="daterange" value="" style="margin-left: 10px; margin-bottom: 20px; width: 200px;" />
+    <table>
+        <tr>
+            <td>
+                <input type="text" name="daterange" id="daterange" value="" style="margin-left: 10px; margin-bottom: 20px; width: 200px;" />
+            </td>
+            <td>
+                <p id="PageResponse" style="margin-top: -10px; text-align: left;"></p>
+            </td>
+        </tr>
+    </table>
 
     <script>
         var markers = L.geoJSON();
@@ -65,7 +76,6 @@
             });
         });
     </script>
-    <p id="PageResponse" style="margin-top: -10px;"></p>
 
     <div id="mapid" style="height:600px; margin-left:10px; margin-right:10px; margin-bottom:10px; resize: vertical;"></div>
 
