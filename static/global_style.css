@@ -1,0 +1,26 @@
+h1,
+h2,
+h3 {
+    color: #1f4258;
+    margin-left: 10px;
+}
+
+.images {
+    margin: 5px;
+    margin-bottom: 20px;
+    margin-left: 10px;
+}
+
+.row img {
+    width: 100%;
+    height: auto;
+}
+
+p {
+    margin-left: 10px;
+}
+
+input[type=text] {
+    margin-left: 10px;
+    margin-bottom: 20px;
+}

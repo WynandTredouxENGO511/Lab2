@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Home</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin="">
+    </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" title="bootstrap">
+    <link rel="stylesheet" type="text/css" href="static/global_style.css">
+</head>
+
+<h1>Home</h1>
+<div class="images">
+    <img src="static/img/Geo.jpg" alt="Geomatics Engineering Logo" height="200" width="auto">
+    <img src="static/img/Schulich.jpg" alt="Schulich Logo" height="200" width="auto">
+</div>
+
+<p>Welcome to my website for ENGO551 lab 2!</p>
+
+<body>
+    <!-- date range widget -->
+    <input type="text" name="daterange" id="daterange" value="" style="margin-left: 10px; margin-bottom: 20px; width: 200px;" />
+
+    <script>
+        var markers = L.geoJSON();
+        // get date range from widget
+        $(function() {
+            $('input[name="daterange"]').daterangepicker({
+                opens: 'left'
+            }, function(start, end, label) {
+                console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                // build JSON query
+                var query = "issueddate > '" + start.format('YYYY-MM-DD') + "' and issueddate < '" + end.format('YYYY-MM-DD') + "'";
+                console.log(query);
+                // get GeoJSON response, store into CalgaryFeatures
+                var CalgaryFeatures;
+                axios.get('https://data.calgary.ca/resource/c2es-76ed.geojson', {
+                        params: {
+                            $where: query
+                        }
+                    })
+                    .then(function(CalgaryFeatures) {
+                        console.log(CalgaryFeatures);
+                        console.log(CalgaryFeatures.data.features.length);
+                        // display # of responses to user
+                        document.getElementById("PageResponse").innerHTML = 'There are ' + CalgaryFeatures.data.features.length + ' permits within the selected date range';
+                        // add GeoJSON to map
+                        mymap.removeLayer(markers); // remove old markers first
+                        markers = L.geoJSON(CalgaryFeatures.data.features);
+                        markers.addTo(mymap); // add new markers
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+
+
+
+
+            });
+        });
+    </script>
+    <p id="PageResponse" style="margin-top: -10px;"></p>
+
+    <div id="mapid" style="height:600px; margin-left:10px; margin-right:10px; margin-bottom:10px; resize: vertical;"></div>
+
+    <script>
+        var mymap = L.map('mapid').setView([51.0447, -114.0719], 12);
+
+        var street = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1Ijoid3luYW5kdHJlZG91eCIsImEiOiJjazdjaGZndzAwZXVtM21teThqZjhsdzBiIn0.MwhI6rhhXpMJ0LkjhXDUHg'
+        }).addTo(mymap);
+
+        var sat = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox/satellite-v9',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1Ijoid3luYW5kdHJlZG91eCIsImEiOiJjazdjaGZndzAwZXVtM21teThqZjhsdzBiIn0.MwhI6rhhXpMJ0LkjhXDUHg'
+        });
+
+        var layers = {
+            'Street View': street,
+            'Satellite View': sat
+        };
+
+        L.control.layers(layers).addTo(mymap);
+    </script>
+
+    <div class="padding" style="margin-top: 300px;"></div>
+</body>
