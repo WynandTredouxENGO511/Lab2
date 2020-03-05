@@ -42,7 +42,11 @@
     </table>
 
     <script>
-        var markers = L.markerClusterGroup();
+        var markers = L.markerClusterGroup({
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: true,
+            zoomToBoundsOnClick: true
+        });
         // get date range from widget
         $(function() {
             $('input[name="daterange"]').daterangepicker({
@@ -52,21 +56,23 @@
                 // build JSON query
                 var query = "issueddate > '" + start.format('YYYY-MM-DD') + "' and issueddate < '" + end.format('YYYY-MM-DD') + "'";
                 console.log(query);
-                // get GeoJSON response, store into CalgaryFeatures
+                // get GeoJSON response using axios, store into CalgaryFeatures
                 var CalgaryFeatures;
                 axios.get('https://data.calgary.ca/resource/c2es-76ed.geojson', {
                         params: {
                             $where: query
                         }
                     })
+                    // after response is received
                     .then(function(CalgaryFeatures) {
                         console.log(CalgaryFeatures);
-                        console.log(CalgaryFeatures.data.features.length);
+                        console.log(CalgaryFeatures.data.features.length); // send # of features to the console
                         // display # of responses to user
                         document.getElementById("PageResponse").innerHTML = 'There are ' + CalgaryFeatures.data.features.length + ' permits within the selected date range';
                         // add GeoJSON to map
                         mymap.removeLayer(markers); // remove old markers first
                         markers.addLayer(new L.geoJSON(CalgaryFeatures.data.features));
+                        mymap.fitBounds(markers.getBounds()); // zoom to show all markers
                         markers.addTo(mymap); // add new markers
                     })
                     .catch(function(error) {
