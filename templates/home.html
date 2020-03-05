@@ -65,32 +65,67 @@
                     })
                     // after response is received
                     .then(function(CalgaryFeatures) {
-                        console.log(CalgaryFeatures);
+                        //console.log(CalgaryFeatures);
                         console.log(CalgaryFeatures.data.features.length); // send # of features to the console
-                        // display # of responses to user
-                        document.getElementById("PageResponse").innerHTML = 'There are ' + CalgaryFeatures.data.features.length + ' permits within the selected date range';
+
                         // add GeoJSON to map
-                        mymap.removeLayer(markers); // remove old markers first
-                        markers.addLayer(new L.geoJSON(CalgaryFeatures.data.features));
+                        markers.clearLayers(); // remove old markers first
+                        //var features = new L.geoJSON(CalgaryFeatures.data.features);
+                        //console.log(features);
+                        var nulls = 0;
+                        var count = 0;
+                        for (var i = 0; i < CalgaryFeatures.data.features.length; i++) {
+                            var a = CalgaryFeatures.data.features[i];
+                            //console.log(i);
+                            //console.log(a);
+                            var geometry = a.geometry;
+                            if (geometry == null) {
+                                console.log('null geometry');
+                                nulls++;
+                                continue;
+                            }
+                            var marker = L.marker(new L.LatLng(geometry.coordinates[1], geometry.coordinates[0]));
+                            var popupstr = "<table><tr><td>Issue Date:</td><td>" +
+                                a.properties.issueddate +
+                                "</td></tr><tr><td>Work Class Group:</td><td>" +
+                                a.properties.workclassgroup +
+                                "</td></tr><tr><td>Contractor Name:</td><td>" +
+                                a.properties.contractorname +
+                                "</td></tr><tr><td>Community Name:</td><td>" +
+                                a.properties.communityname +
+                                "</td></tr><tr><td>Original Address:</td><td>" +
+                                a.properties.originaladdress +
+                                "</td></tr></table>";
+                            marker.bindPopup(popupstr);
+                            markers.addLayer(marker);
+                            count++;
+                        }
+                        // display # of responses to user
+                        var PageResponsestr = CalgaryFeatures.data.features.length + ' permits found within the selected date range.';
+                        if (nulls > 0) {
+                            PageResponsestr += ' ' + nulls + ' have no location data and cannot be displayed';
+                        }
+                        document.getElementById("PageResponse").innerHTML = PageResponsestr;
+                        console.log(count);
+
+                        //markers.addLayer(features);
                         mymap.fitBounds(markers.getBounds()); // zoom to show all markers
                         markers.addTo(mymap); // add new markers
                     })
                     .catch(function(error) {
                         console.log(error);
                     });
-
-
-
-
             });
         });
     </script>
 
+    <!-- Create and display map -->
     <div id="mapid" style="height:600px; margin-left:10px; margin-right:10px; margin-bottom:10px; resize: vertical;"></div>
 
     <script>
+        // map centered on calgary
         var mymap = L.map('mapid').setView([51.0447, -114.0719], 12);
-
+        // street layer (default)
         var street = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             maxZoom: 18,
@@ -99,7 +134,7 @@
             zoomOffset: -1,
             accessToken: 'pk.eyJ1Ijoid3luYW5kdHJlZG91eCIsImEiOiJjazdjaGZndzAwZXVtM21teThqZjhsdzBiIn0.MwhI6rhhXpMJ0LkjhXDUHg'
         }).addTo(mymap);
-
+        // satellite layer
         var sat = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             maxZoom: 18,
@@ -113,8 +148,12 @@
             'Street View': street,
             'Satellite View': sat
         };
-
+        // display map
         L.control.layers(layers).addTo(mymap);
+
+        // markers.on('click', function(a) {
+        //     console.log(a);
+        // });
     </script>
 
     <div class="padding" style="margin-top: 300px;"></div>
