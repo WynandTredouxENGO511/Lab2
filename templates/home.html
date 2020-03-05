@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin="">
     </script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" title="bootstrap">
     <link rel="stylesheet" type="text/css" href="static/global_style.css">
 </head>
@@ -28,7 +31,7 @@
     <input type="text" name="daterange" id="daterange" value="" style="margin-left: 10px; margin-bottom: 20px; width: 200px;" />
 
     <script>
-        var markers = L.geoJSON();
+        var markers = L.markerClusterGroup();
         // get date range from widget
         $(function() {
             $('input[name="daterange"]').daterangepicker({
@@ -52,7 +55,7 @@
                         document.getElementById("PageResponse").innerHTML = 'There are ' + CalgaryFeatures.data.features.length + ' permits within the selected date range';
                         // add GeoJSON to map
                         mymap.removeLayer(markers); // remove old markers first
-                        markers = L.geoJSON(CalgaryFeatures.data.features);
+                        markers.addLayer(new L.geoJSON(CalgaryFeatures.data.features));
                         markers.addTo(mymap); // add new markers
                     })
                     .catch(function(error) {
