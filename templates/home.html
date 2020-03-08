@@ -102,9 +102,12 @@
                         }
                         // display # of responses to user
                         var PageResponsestr = CalgaryFeatures.data.features.length + ' permits found within the selected date range.';
-                        if (nulls > 0) {
+                        if (nulls > 1) {
                             PageResponsestr += ' ' + nulls + ' have no location data and cannot be displayed';
-                        }
+                        }else if (nulls > 0){
+							PageResponsestr += ' ' + nulls + ' has no location data and cannot be displayed';
+						}
+						
                         document.getElementById("PageResponse").innerHTML = PageResponsestr;
                         console.log(count);
 
